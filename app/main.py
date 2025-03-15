@@ -5,6 +5,8 @@ from app.routers import game, auth, challenge, leaderboard, notifications
 from PIL import Image, ImageDraw, ImageFont
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
+from fastapi.openapi.utils import get_openapi
+
 import io
 
 app = FastAPI(
@@ -14,10 +16,17 @@ app = FastAPI(
     openapi_url="/openapi.json"
 )
 # Custom OpenAPI Schema (optional, auto-handled by FastAPI)
+# Store the original OpenAPI function
+# ✅ Custom OpenAPI Schema - Ensures JWT Bearer Token appears in Swagger UI
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
-    openapi_schema = app.openapi()
+    openapi_schema = get_openapi(
+        title=app.title,
+        version="1.0.0",
+        description="Globetrotter Challenge API with JWT authentication",
+        routes=app.routes,
+    )
     openapi_schema["components"]["securitySchemes"] = {
         "BearerAuth": {
             "type": "http",
@@ -25,11 +34,11 @@ def custom_openapi():
             "bearerFormat": "JWT",
         }
     }
-    openapi_schema["security"] = [{"BearerAuth": []}]
+    openapi_schema["security"] = [{"BearerAuth": []}]  # Apply security globally
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
-# Apply the custom OpenAPI schema
+# Override FastAPI's OpenAPI generation
 app.openapi = custom_openapi
 
 # Mount your static files on /static (or another subpath)
