@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Globetrotter Challenge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .hidden { display: none; }
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .center { display: block; margin: 20px auto; }
+    input {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+      max-width: 300px;
+      font-size: 1rem;
+    }
+    .error { color: red; }
+    #statusDiv { margin-top: 10px; font-size: 1.1rem; }
+    /* Navigation Bar */
+    #navBar {
+      background: #eee;
+      padding: 10px;
+      text-align: right;
+      margin-bottom: 20px;
+    }
+    #navBar button {
+      font-size: 0.9rem;
+      padding: 5px 10px;
+    }
+    /* Modal styles for challenge popup */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      position: absolute;
+      right: 10px;
+      top: 5px;
+      cursor: pointer;
+    }
+    .modal-image {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar (visible after login) -->
+  <div id="navBar" class="hidden">
+    <button onclick="showHome()">Home</button>
+  </div>
+
+  <h1>Globetrotter Challenge</h1>
+
+  <!-- Login & Registration Section -->
+  <div id="authDiv">
+    <!-- Login Form -->
+    <div id="loginDiv">
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button id="loginBtn">Login</button>
+      <p id="loginError" class="error"></p>
+      <p>Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
+    </div>
+    <!-- Registration Form -->
+    <div id="registerDiv" class="hidden">
+      <h2>Register</h2>
+      <input type="email" id="regEmail" placeholder="Email">
+      <input type="text" id="regUsername" placeholder="Username">
+      <input type="password" id="regPassword" placeholder="Password">
+      <button id="registerBtn">Register</button>
+      <p id="regError" class="error"></p>
+      <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+      <p id="regSuccess" style="color: green;"></p>
+    </div>
+  </div>
+
+  <!-- Home Section (displayed after login) -->
+  <div id="homeDiv" class="hidden">
+    <h2>Home</h2>
+    <p id="welcomeMsg"></p>
+    <button id="playGameBtn">Play Game</button>
+    <button id="challengeFriendBtn">Challenge a Friend</button>
+    <h3>Global Leaderboard</h3>
+    <div id="leaderboardDiv"></div>
+  </div>
+
+  <!-- Game Section -->
+  <div id="gameDiv" class="hidden">
+    <h2>Game Session</h2>
+    <div id="statusDiv"></div>
+    <div id="questionDiv"></div>
+    <p id="feedback"></p>
+    <p>Your Score: <span id="scoreDisplay">0</span></p>
+    <p>
+      Correct: <span id="correctCount">0</span> |
+      Incorrect: <span id="incorrectCount">0</span>
+    </p>
+    <button id="nextBtn" class="hidden">Next</button>
+    <button id="playAgainBtn" class="hidden center">Play Again</button>
+  </div>
+
+  <!-- Challenge Modal -->
+  <div id="challengeModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h3>Challenge a Friend</h3>
+      <img id="challengeImage" class="modal-image" src="https://via.placeholder.com/500x200?text=Challenge+Your+Friend" alt="Challenge Image">
+      <p id="challengeDetails"></p>
+      <a id="whatsappLink" target="_blank">
+        <button>Share on WhatsApp</button>
+      </a>
+      <br>
+      <button id="copyLinkBtn">Copy Invite Link</button>
+    </div>
+  </div>
+
+  <script>
+    let token = "";
+    let sessionId = "";
+    let currentQuestion = null;
+    const totalQuestions = 10;
+    let currentQuestionIndex = 0;
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let currentUser = null; // Logged-in user ID
+
+    // Simple JWT decode function (for demo only; not secure for production)
+    function decodeJWT(token) {
+      try {
+        const payload = token.split('.')[1];
+        return JSON.parse(atob(payload));
+      } catch (e) {
+        console.error("Error decoding token", e);
+        return {};
+      }
+    }
+
+    // Toggle between Login and Registration forms
+    function showRegister() {
+      document.getElementById("loginDiv").classList.add("hidden");
+      document.getElementById("registerDiv").classList.remove("hidden");
+    }
+    function showLogin() {
+      document.getElementById("registerDiv").classList.add("hidden");
+      document.getElementById("loginDiv").classList.remove("hidden");
+      document.getElementById("regSuccess").textContent = "";
+    }
+
+    // Show Home page, hide Game page, and refresh leaderboard
+    function showHome() {
+      document.getElementById("navBar").classList.add("hidden");
+      document.getElementById("gameDiv").classList.add("hidden");
+      document.getElementById("homeDiv").classList.remove("hidden");
+      loadLeaderboard();
+    }
+
+    // Poll notifications every 5 seconds (optional)
+    function pollNotifications() {
+      fetch("http://localhost:8000/notifications", {
+        headers: { "Authorization": "Bearer " + token }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          data.forEach(notif => {
+            alert("Notification: " + notif.message);
+            markNotificationAsRead(notif.id);
+          });
+          loadNotifications();
+        }
+      })
+      .catch(err => console.error("Error polling notifications:", err));
+    }
+
+    function loadNotifications() {
+      fetch("http://localhost:8000/notifications", {
+        headers: { "Authorization": "Bearer " + token }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Optionally, display notifications on Home page
+      })
+      .catch(err => console.error("Error loading notifications:", err));
+    }
+
+    function markNotificationAsRead(notificationId) {
+      fetch(`http://localhost:8000/notifications/${notificationId}/read`, {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + token }
+      })
+      .then(response => response.json())
+      .then(data => console.log("Notification marked as read:", data))
+      .catch(err => console.error("Error marking notification as read:", err));
+    }
+
+    // Registration function
+    function registerUser() {
+      const email = document.getElementById("regEmail").value;
+      const username = document.getElementById("regUsername").value;
+      const password = document.getElementById("regPassword").value;
+      fetch("http://localhost:8000/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, username, password })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("Registration failed");
+        return response.json();
+      })
+      .then(data => {
+        console.log("Registration successful:", data);
+        document.getElementById("regSuccess").textContent = "Registration successful! Please log in.";
+        // Optionally, auto-switch to login form
+        showLogin();
+      })
+      .catch(error => {
+        console.error("Registration error:", error);
+        document.getElementById("regError").textContent = error.message;
+      });
+    }
+
+    // Attach event listener for registration button
+    document.getElementById("registerBtn")?.addEventListener("click", registerUser);
+
+    // Event listener for login already attached below
+    document.getElementById("loginBtn").addEventListener("click", loginUser);
+    document.getElementById("playGameBtn").addEventListener("click", () => {
+      document.getElementById("homeDiv").classList.add("hidden");
+      document.getElementById("navBar").classList.remove("hidden");
+      startGameSession();
+    });
+    document.getElementById("challengeFriendBtn").addEventListener("click", openChallengeModal);
+    document.getElementById("nextBtn").addEventListener("click", displayQuestion);
+    document.getElementById("playAgainBtn").addEventListener("click", () => { startGameSession(); });
+    document.getElementById("closeModal").addEventListener("click", closeChallengeModal);
+    document.getElementById("copyLinkBtn").addEventListener("click", copyInviteLink);
+
+    // function loginUser() {
+    //   const email = document.getElementById("loginEmail").value;
+    //   const password = document.getElementById("loginPassword").value;
+    //   fetch("http://localhost:8000/auth/login", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ email, password })
+    //   })
+    //   .then(response => {
+    //     if (!response.ok) throw new Error("Login failed");
+    //     return response.json();
+    //   })
+    //   .then(data => {
+    //     console.log("Login successful:", data);
+    //     token = data.access_token;
+    //     localStorage.setItem("token", token);
+    //     const decoded = decodeJWT(token);
+    //     currentUser = decoded.user_id;
+    //     document.getElementById("authDiv").classList.add("hidden");
+    //     document.getElementById("homeDiv").classList.remove("hidden");
+    //     document.getElementById("navBar").classList.remove("hidden");
+    //     document.getElementById("welcomeMsg").textContent = `Welcome, ${decoded.username || data.email}`;
+    //     loadLeaderboard();
+    //     setInterval(pollNotifications, 5000);
+    //   })
+    //   .catch(error => {
+    //     console.error("Login error:", error);
+    //     document.getElementById("loginError").textContent = error.message;
+    //   });
+    // }
+    function loginUser() {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      fetch("http://localhost:8000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("Login failed");
+        return response.json();
+      })
+      .then(data => {
+        console.log("Login successful:", data);
+        token = data.access_token;
+        localStorage.setItem("token", token);
+        const decoded = decodeJWT(token);
+        currentUser = decoded.user_id;
+        document.getElementById("authDiv").classList.add("hidden");
+        document.getElementById("homeDiv").classList.remove("hidden");
+        document.getElementById("navBar").classList.remove("hidden");
+        // Display the welcome message using the username from the login response
+        document.getElementById("welcomeMsg").textContent = `Welcome, ${data.username}`;
+        loadLeaderboard();
+        setInterval(pollNotifications, 5000);
+      })
+      .catch(error => {
+        console.error("Login error:", error);
+        document.getElementById("loginError").textContent = error.message;
+      });
+    }
+
+    function loadLeaderboard() {
+      fetch("http://localhost:8000/leaderboard/global", {
+        headers: { "Authorization": "Bearer " + token }
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Leaderboard data:", data);
+        const lbDiv = document.getElementById("leaderboardDiv");
+        lbDiv.innerHTML = "";
+        data.forEach(entry => {
+          lbDiv.innerHTML += `<p>${entry.username}: ${entry.score}</p>`;
+        });
+      })
+      .catch(err => console.error("Error loading leaderboard:", err));
+    }
+
+    function startGameSession() {
+      // Reset game state
+      currentQuestionIndex = 0;
+      correctCount = 0;
+      incorrectCount = 0;
+      document.getElementById("correctCount").textContent = correctCount;
+      document.getElementById("incorrectCount").textContent = incorrectCount;
+      document.getElementById("scoreDisplay").textContent = 0;
+      document.getElementById("statusDiv").textContent = "";
+      document.getElementById("feedback").textContent = "";
+
+      fetch("http://localhost:8000/game/session/start?ts=" + new Date().getTime(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Game session started:", data);
+        sessionId = data.session_id;
+        currentQuestion = data.question;
+        document.getElementById("gameDiv").classList.remove("hidden");
+        displayQuestion();
+        loadLeaderboard(); // Refresh leaderboard when game starts
+      })
+      .catch(err => {
+        console.error("Error starting game session:", err);
+        document.getElementById("feedback").textContent = "Error starting game session.";
+      });
+    }
+
+    function displayQuestion() {
+      const qDiv = document.getElementById("questionDiv");
+      qDiv.innerHTML = "";
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("nextBtn").classList.add("hidden");
+      document.getElementById("playAgainBtn").classList.add("hidden");
+
+      // Update status display with question number and counts
+      document.getElementById("statusDiv").textContent = `Question ${currentQuestionIndex + 1} of ${totalQuestions} | Correct: ${correctCount} | Incorrect: ${incorrectCount}`;
+
+      if (!currentQuestion) {
+        qDiv.innerHTML = "<p>No question available.</p>";
+        return;
+      }
+
+      // Display clues
+      qDiv.innerHTML += "<h3>Clues:</h3>";
+      currentQuestion.clues.forEach(clue => {
+        qDiv.innerHTML += `<p>${clue}</p>`;
+      });
+
+      // Display multiple-choice options as buttons
+      qDiv.innerHTML += "<h3>Options:</h3>";
+      currentQuestion.options.forEach(option => {
+        qDiv.innerHTML += `<button class="optionBtn" onclick="handleOptionClick(this, '${option}')">${option}</button>`;
+      });
+    }
+
+    function disableOptions() {
+      const buttons = document.querySelectorAll(".optionBtn");
+      buttons.forEach(btn => btn.disabled = true);
+    }
+
+    function handleOptionClick(button, selectedOption) {
+      disableOptions();
+      submitAnswer(selectedOption);
+    }
+
+    function submitAnswer(selectedOption) {
+      fetch(`http://localhost:8000/game/session/${sessionId}/submit`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          destination_id: currentQuestion.destination_id,
+          selected_option: selectedOption,
+          hint_used: false
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Answer response:", data);
+        const funFact = data.fun_fact ? data.fun_fact : "";
+        if (data.correct) {
+          correctCount++;
+        } else {
+          incorrectCount++;
+        }
+        document.getElementById("feedback").textContent = data.correct
+          ? "Correct! " + funFact
+          : "Incorrect! " + funFact;
+        document.getElementById("scoreDisplay").textContent = data.current_score;
+
+        currentQuestionIndex++;
+        if (currentQuestionIndex < totalQuestions && data.next_question) {
+          currentQuestion = data.next_question;
+          document.getElementById("nextBtn").classList.remove("hidden");
+          document.getElementById("statusDiv").textContent = `Question ${currentQuestionIndex + 1} of ${totalQuestions} | Correct: ${correctCount} | Incorrect: ${incorrectCount}`;
+        } else {
+          document.getElementById("statusDiv").textContent = `Game session completed! Your final score: ${data.final_score}`;
+          document.getElementById("playAgainBtn").classList.remove("hidden");
+          document.getElementById("questionDiv").innerHTML = "";
+          loadLeaderboard(); // Refresh leaderboard when game is finished
+        }
+      })
+      .catch(err => {
+        console.error("Error submitting answer:", err);
+        document.getElementById("feedback").textContent = "Error submitting answer.";
+      });
+    }
+
+    // Open the challenge modal popup with dynamic invite link for WhatsApp and copy option
+    function openChallengeModal() {
+      if (!currentUser) {
+        alert("User id not found. Please log in again.");
+        return;
+      }
+      fetch(`http://localhost:8000/challenge/${currentUser}`, {
+        headers: { "Authorization": "Bearer " + token }
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Challenge data:", data);
+        const shareLink = data.share_link;
+        const shareText = encodeURIComponent(`Join me on Globetrotter Challenge! I scored ${data.score}. Click here to play: ${shareLink}`);
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${shareText}`;
+        document.getElementById("challengeDetails").textContent = `Invited by: ${data.username}\nScore: ${data.score}\nInvite Link: ${shareLink}`;
+        document.getElementById("whatsappLink").href = whatsappUrl;
+        document.getElementById("challengeModal").style.display = "block";
+      })
+      .catch(err => console.error("Error fetching challenge details:", err));
+    }
+
+    function closeChallengeModal() {
+      document.getElementById("challengeModal").style.display = "none";
+    }
+
+    // Copy the invite link to clipboard
+    function copyInviteLink() {
+      const challengeText = document.getElementById("challengeDetails").textContent;
+      const linkMatch = challengeText.match(/http.*$/);
+      if (linkMatch) {
+        const shareLink = linkMatch[0];
+        navigator.clipboard.writeText(shareLink)
+          .then(() => {
+            alert("Invite link copied to clipboard!");
+          })
+          .catch(err => {
+            console.error("Failed to copy invite link: ", err);
+          });
+      } else {
+        alert("Invite link not found.");
+      }
+    }
+  </script>
+</body>
+</html>
