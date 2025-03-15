@@ -188,6 +188,41 @@
       document.getElementById("homeDiv").classList.remove("hidden");
       loadLeaderboard();
     }
+    function getQueryParameter(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+    function updateChallengeResult(friendScore) {
+      const inviterId = getQueryParameter("inviter_id");
+      if (!inviterId) {
+        console.log("No inviter_id provided in URL");
+        return;
+      }
+      const payload = {
+        inviter_id: parseInt(inviterId),
+        friend_id: currentUser,  // currentUser is set upon login
+        friend_score: friendScore
+      };
+      fetch("http://localhost:8000/challenge/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Challenge update response:", data);
+        // Display the notification for the friend
+        if (data.message && data.message.friend_message) {
+          alert(data.message.friend_message);
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(err => console.error("Error updating challenge:", err));
+    }
 
     // Poll notifications every 5 seconds (optional)
     // function pollNotifications() {
@@ -208,26 +243,26 @@
     //   .catch(err => console.error("Error polling notifications:", err));
     // }
 
-    function loadNotifications() {
-      fetch("http://localhost:8000/notifications", {
-        headers: { "Authorization": "Bearer " + token }
-      })
-      .then(response => response.json())
-      .then(data => {
-        // Optionally, display notifications on Home page
-      })
-      .catch(err => console.error("Error loading notifications:", err));
-    }
+    // function loadNotifications() {
+    //   fetch("http://localhost:8000/notifications", {
+    //     headers: { "Authorization": "Bearer " + token }
+    //   })
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     // Optionally, display notifications on Home page
+    //   })
+    //   .catch(err => console.error("Error loading notifications:", err));
+    // }
 
-    function markNotificationAsRead(notificationId) {
-      fetch(`http://localhost:8000/notifications/${notificationId}/read`, {
-        method: "POST",
-        headers: { "Authorization": "Bearer " + token }
-      })
-      .then(response => response.json())
-      .then(data => console.log("Notification marked as read:", data))
-      .catch(err => console.error("Error marking notification as read:", err));
-    }
+    // function markNotificationAsRead(notificationId) {
+    //   fetch(`http://localhost:8000/notifications/${notificationId}/read`, {
+    //     method: "POST",
+    //     headers: { "Authorization": "Bearer " + token }
+    //   })
+    //   .then(response => response.json())
+    //   .then(data => console.log("Notification marked as read:", data))
+    //   .catch(err => console.error("Error marking notification as read:", err));
+    // }
 
     // Registration function
     function registerUser() {
@@ -452,6 +487,8 @@
           document.getElementById("statusDiv").textContent = `Question ${currentQuestionIndex + 1} of ${totalQuestions} | Correct: ${correctCount} | Incorrect: ${incorrectCount}`;
         } else {
           document.getElementById("statusDiv").textContent = `Game session completed! Your final score: ${data.final_score}`;
+          // Call updateChallengeResult to notify friend if they beat the inviter
+          updateChallengeResult(data.final_score);
           document.getElementById("playAgainBtn").classList.remove("hidden");
           document.getElementById("questionDiv").innerHTML = "";
           loadLeaderboard(); // Refresh leaderboard when game is finished

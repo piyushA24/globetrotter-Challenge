@@ -1,0 +1,18 @@
+# Test your FastAPI endpoints
+
+GET http://localhost:8000/game/random
+#Accept: application/json
+
+####
+#
+#GET http://127.0.0.1:8000/hello/User
+#Accept: application/json
+#
+####
+
+POST http://localhost:8000/game/session/start
+
+
+
+
+GET http://localhost:8000/game/session/"6c0e8cb2-8086-4da2-925a-f27cc7c62e34"/question

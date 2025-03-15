@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
 from app.models.user import User
 from app.models.leaderboard import Leaderboard
-from app.models.notification import Notification
+from app.models.notifications import Notification
 from pydantic import BaseModel
 import os
 router = APIRouter()

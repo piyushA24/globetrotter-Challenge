@@ -1,8 +1,7 @@
 import json
 import os
-from app.services.opensearch_service import get_opensearch_client, create_index_if_not_exists
-from app.core.config import OPENSEARCH_INDEX
-from app.core.database import SessionLocal
+from app.core.database import SessionLocal, engine, Base
+from app.models.destination import Destination
 from app.models.user import User
 from sqlalchemy.exc import IntegrityError
 
@@ -11,18 +10,36 @@ def load_destination_data(json_file_path: str):
         data = json.load(f)
     return data
 
-def insert_data_into_opensearch():
-    client = get_opensearch_client()
-    print(client)
-    create_index_if_not_exists(client)
-
-    # Build the path to your JSON file using a relative path.
-    json_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "destination_info.json")
-    data = load_destination_data(json_file_path)
-
-    for idx, doc in enumerate(data):
-        response = client.index(index=OPENSEARCH_INDEX, id=idx + 1, body=doc)
-        print(f"Inserted document {idx + 1}: {response['result']}")
+def insert_data_into_postgres():
+    # Create tables if they don't exist
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        # Build the path to your JSON file using a relative path.
+        # Adjust the relative path based on your project structure.
+        json_file_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+            "data", "destination_info.json"
+        )
+        data = load_destination_data(json_file_path)
+        print(data[0:10])
+        for idx, doc in enumerate(data):
+            destination = Destination(
+                city=doc.get("city"),
+                country=doc.get("country"),
+                clues=doc.get("clues"),
+                fun_fact=doc.get("fun_fact"),
+                trivia=doc.get("trivia"),
+                options=doc.get("options")
+            )
+            db.add(destination)
+        db.commit()
+        print("Inserted destination data into PostgreSQL for destination.")
+    except Exception as e:
+        db.rollback()
+        print("Error inserting destination data:", e)
+    finally:
+        db.close()
 
 def insert_dummy_user():
     db = SessionLocal()
@@ -44,7 +61,8 @@ def insert_dummy_user():
         db.close()
 
 if __name__ == "__main__":
-    print("Inserting destination data into OpenSearch...")
-    insert_data_into_opensearch()
-    # Optionally insert a dummy user:
+    print("Inserting destination data into PostgreSQL...")
+    insert_data_into_postgres()
+    insert_dummy_user()
+    # Optionally, insert a dummy user:
     # insert_dummy_user()
