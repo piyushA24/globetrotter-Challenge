@@ -5,7 +5,6 @@ from app.routers import game, auth, challenge, leaderboard, notifications
 from PIL import Image, ImageDraw, ImageFont
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
-from fastapi.openapi.utils import get_openapi
 
 import io
 
