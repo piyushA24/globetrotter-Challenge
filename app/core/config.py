@@ -8,9 +8,9 @@ load_dotenv()  # Load environment variables from a .env file if available
 
 # PostgreSQL settings
 POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "Piyush@123")
-POSTGRES_DB = os.getenv("POSTGRES_DB", "globetrotter")  # Replace with your actual DB name
-POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "VgPJpyArnNArMLxnxcTyFDXJVshVzIbM")
+POSTGRES_DB = os.getenv("POSTGRES_DB", "railway")  # Replace with your actual DB name
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "postgres.railway.internal")
 POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
 
 # URL encode the password
