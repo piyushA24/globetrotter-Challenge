@@ -16,17 +16,17 @@ services:
       # Set FRONTEND_URL to a placeholder; Railway will override this in its settings:
       - FRONTEND_URL=https://globetrotter-challenge-production-37b8.up.railway.app/static/index.html
 
-#  postgres:
-#    image: postgres:15
-#    restart: always
-#    environment:
-#      - POSTGRES_USER=postgres
-#      - POSTGRES_PASSWORD=VgPJpyArnNArMLxnxcTyFDXJVshVzIbM
-#      - POSTGRES_DB=railway
-#    ports:
-#      - "5432:5432"
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=VgPJpyArnNArMLxnxcTyFDXJVshVzIbM
+      - POSTGRES_DB=railway
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-#volumes:
-#  postgres_data:
+volumes:
+  postgres_data:
