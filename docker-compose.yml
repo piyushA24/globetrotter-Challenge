@@ -8,12 +8,13 @@ services:
       - postgres
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=Piyush@123
-      - POSTGRES_DB=globetrotter
-      - POSTGRES_HOST=postgres
+      - POSTGRES_PASSWORD=VgPJpyArnNArMLxnxcTyFDXJVshVzIbM
+      - POSTGRES_DB=railway
+      - POSTGRES_HOST=postgres.railway.internal
       - POSTGRES_PORT=5432
       - SECRET_KEY=mysecretkey
-      - FRONTEND_URL=http://0.0.0.0:8000/static/index.html
+      # Set FRONTEND_URL to a placeholder; Railway will override this in its settings:
+      - FRONTEND_URL=http://localhost:8000/static/index.html
   postgres:
     image: postgres:15
     restart: always

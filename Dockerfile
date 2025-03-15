@@ -13,6 +13,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy the entire project
 COPY . .
 
+# Ensure the entrypoint script is executable
+RUN chmod +x /app/entrypoint.sh
+
 EXPOSE 8000
 
 # Use the entrypoint script to seed data and start the app

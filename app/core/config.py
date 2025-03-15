@@ -17,8 +17,8 @@ POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
 POSTGRES_PASSWORD_ENCODED = quote(POSTGRES_PASSWORD)
 
 SQLALCHEMY_DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD_ENCODED}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
-print("here")
-print(SQLALCHEMY_DATABASE_URL)
+# print("here")
+# print(SQLALCHEMY_DATABASE_URL)
 # OpenSearch settings
 # OPENSEARCH_HOST = os.getenv("OPENSEARCH_HOST", "localhost")
 # OPENSEARCH_PORT = os.getenv("OPENSEARCH_PORT", "9201")
@@ -26,7 +26,7 @@ print(SQLALCHEMY_DATABASE_URL)
 # OPENSEARCH_PASSWORD = os.getenv("OPENSEARCH_PASSWORD", "Piyush@123")
 # OPENSEARCH_INDEX = os.getenv("OPENSEARCH_INDEX", "destinations")
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://0.0.0.0:8000/static/index.html")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000/static/index.html")
 
 # JWT settings
 SECRET_KEY = os.getenv("SECRET_KEY", "mysecretkey")  # Replace with a strong secret in production
