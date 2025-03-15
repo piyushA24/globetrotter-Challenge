@@ -32,9 +32,11 @@ This command will:
 - Expose the FastAPI app on port `8000`.
 
 ### 4. Access the Application
-- **API Docs:** Open [http://localhost:8000/docs](http://localhost:8000/docs)
-- **ReDoc Documentation:** Open [http://localhost:8000/redoc](http://localhost:8000/redoc)
-- **Frontend UI:** Open `FRONTEND_URL` (configured in `.env` or `docker-compose.yml`)
+- **API Docs (Local):** Open [http://localhost:8000/docs](http://localhost:8000/docs)
+- **ReDoc Documentation (Local):** Open [http://localhost:8000/redoc](http://localhost:8000/redoc)
+- **Frontend UI (Local):** Open `FRONTEND_URL` (configured in `.env` or `docker-compose.yml`)
+- **Live Game UI:** [https://globetrotter-challenge-production-37b8.up.railway.app/static/index.html#](https://globetrotter-challenge-production-37b8.up.railway.app/static/index.html#)
+- **Live API Docs:** [https://globetrotter-challenge-production-37b8.up.railway.app/docs](https://globetrotter-challenge-production-37b8.up.railway.app/docs)
 
 ## Database Configuration
 The PostgreSQL database is configured with:
@@ -102,4 +104,3 @@ This application is deployed using **Railway**, which automatically manages envi
 
 ---
 This project is primarily focused on backend integration, ensuring a robust API and database setup. The frontend is minimal, designed mainly for testing API interactions.
-
