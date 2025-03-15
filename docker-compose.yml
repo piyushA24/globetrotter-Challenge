@@ -19,13 +19,14 @@ services:
       - OPENSEARCH_PASSWORD=Piyush@123
       - OPENSEARCH_INDEX=destinations
       - SECRET_KEY=mysecretkey
+      - FRONTEND_URL=http://localhost:8000/static/index.html
   postgres:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Piyush@123
-      POSTGRES_DB: globetrotter
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Piyush@123
+      - POSTGRES_DB=globetrotter
     ports:
       - "5432:5432"
     volumes:
@@ -38,12 +39,13 @@ services:
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
       - cluster.name=opensearch-cluster
       - node.name=opensearch-node1
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Piyush@123
     ulimits:
       memlock:
         soft: -1
         hard: -1
     ports:
-      - "9200:9200"
+      - "9201:9200"
     volumes:
       - opensearch_data:/usr/share/opensearch/data
 

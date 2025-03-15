@@ -21,11 +21,12 @@ print("here")
 print(SQLALCHEMY_DATABASE_URL)
 # OpenSearch settings
 OPENSEARCH_HOST = os.getenv("OPENSEARCH_HOST", "localhost")
-OPENSEARCH_PORT = os.getenv("OPENSEARCH_PORT", "9200")
+OPENSEARCH_PORT = os.getenv("OPENSEARCH_PORT", "9201")
 OPENSEARCH_USER = os.getenv("OPENSEARCH_USER", "admin")
 OPENSEARCH_PASSWORD = os.getenv("OPENSEARCH_PASSWORD", "Piyush@123")
 OPENSEARCH_INDEX = os.getenv("OPENSEARCH_INDEX", "destinations")
 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000/static/index.html")
 
 # JWT settings
 SECRET_KEY = os.getenv("SECRET_KEY", "mysecretkey")  # Replace with a strong secret in production

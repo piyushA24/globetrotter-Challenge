@@ -5,7 +5,7 @@ from app.models.user import User
 from app.models.leaderboard import Leaderboard
 from app.models.notification import Notification
 from pydantic import BaseModel
-
+import os
 router = APIRouter()
 
 
@@ -17,6 +17,7 @@ def get_db():
         db.close()
 
 
+
 @router.get("/challenge/{inviter_id}", summary="Get challenge details for an inviter")
 def get_challenge_details(inviter_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == inviter_id).first()
@@ -26,8 +27,9 @@ def get_challenge_details(inviter_id: int, db: Session = Depends(get_db)):
     lb_entry = db.query(Leaderboard).filter(Leaderboard.user_id == inviter_id).first()
     inviter_score = lb_entry.score if lb_entry else 0
 
-    # Generate a share link using your frontend URL.
-    share_link = f"http://localhost:63342/globetrotterChallenge/index.html?_ijt=m5cjhto7durd0hkmjq9tjradkd&_ij_reload=RELOAD_ON_SAVE&inviter_id={inviter_id}"
+    # Use the FRONTEND_URL environment variable if set; otherwise, default to the static UI
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:8000/static/index.html")
+    share_link = f"{frontend_url}?inviter_id={inviter_id}"
 
     return {
         "inviter_id": inviter_id,
@@ -35,7 +37,6 @@ def get_challenge_details(inviter_id: int, db: Session = Depends(get_db)):
         "score": inviter_score,
         "share_link": share_link
     }
-
 
 class ChallengeResult(BaseModel):
     inviter_id: int

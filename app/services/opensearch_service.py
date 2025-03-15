@@ -1,10 +1,10 @@
 # app/services/opensearch_service.py
 from opensearchpy import OpenSearch
-from app.core.config import OPENSEARCH_HOST, OPENSEARCH_USER, OPENSEARCH_PASSWORD, OPENSEARCH_INDEX
+from app.core.config import OPENSEARCH_HOST, OPENSEARCH_USER, OPENSEARCH_PASSWORD, OPENSEARCH_INDEX,OPENSEARCH_PORT
 
 def get_opensearch_client():
     client = OpenSearch(
-        hosts=[OPENSEARCH_HOST],
+        hosts=[{"host": OPENSEARCH_HOST, "port": OPENSEARCH_PORT}],
         http_auth=(OPENSEARCH_USER, OPENSEARCH_PASSWORD),
         use_ssl=True,
         verify_certs=False,  # For local development; remove in production!

@@ -105,6 +105,52 @@ class SessionAnswer(BaseModel):
     hint_used: bool = False
 
 
+# @router.post("/game/session/{session_id}/submit", summary="Submit answer for current session question")
+# def submit_session_answer(session_id: str, answer: SessionAnswer, current_user: int = Depends(get_current_user)):
+#     session = sessions.get(session_id)
+#     if not session:
+#         raise HTTPException(status_code=404, detail="Session not found")
+#     if session.current_index >= len(session.questions):
+#         raise HTTPException(status_code=400, detail="Session already completed")
+#
+#     current_question = session.questions[session.current_index]
+#     if str(current_question.get("destination_id")) != str(answer.destination_id):
+#         raise HTTPException(
+#             status_code=400,
+#             detail="This question has already been answered or an invalid submission was made."
+#         )
+#
+#     correct_city = current_question.get("city", "").strip().lower()
+#     selected_option = answer.selected_option.strip().lower()
+#
+#     is_correct = (selected_option == correct_city)
+#     points = 10 if is_correct and not answer.hint_used else 5 if is_correct and answer.hint_used else 0
+#
+#     session.score += points
+#     session.answers.append({
+#         "question": current_question,
+#         "selected_option": answer.selected_option,
+#         "correct": is_correct,
+#         "points": points
+#     })
+#
+#     feedback = {
+#         "correct": is_correct,
+#         "fun_fact": current_question.get("fun_fact", [""])[0],
+#         "points_awarded": points,
+#         "current_score": session.score
+#     }
+#
+#     session.current_index += 1
+#     if session.current_index < len(session.questions):
+#         feedback["next_question"] = session.questions[session.current_index]
+#     else:
+#         feedback["message"] = "Game session completed"
+#         # Update leaderboard with final score for the current user.
+#         update_user_leaderboard(current_user, session.score)
+#         feedback["final_score"] = session.score
+#
+#     return feedback
 @router.post("/game/session/{session_id}/submit", summary="Submit answer for current session question")
 def submit_session_answer(session_id: str, answer: SessionAnswer, current_user: int = Depends(get_current_user)):
     session = sessions.get(session_id)
@@ -134,9 +180,19 @@ def submit_session_answer(session_id: str, answer: SessionAnswer, current_user: 
         "points": points
     })
 
+    # Get the fun fact; fallback to empty string if not available
+    fun_fact = current_question.get("fun_fact", [""])[0]
+
+    # Build feedback text with emojis and correct answer (if needed)
+    if is_correct:
+        feedback_text = f"🎉 Correct Answer, \nFun Fact: {fun_fact}"
+    else:
+        correct_answer = current_question.get("city", "Unknown")
+        feedback_text = f"😢 Incorrect Answer, \nCorrect Answer: {correct_answer}, \nFun Fact: {fun_fact}"
+
     feedback = {
         "correct": is_correct,
-        "fun_fact": current_question.get("fun_fact", [""])[0],
+        "feedback_text": feedback_text,
         "points_awarded": points,
         "current_score": session.score
     }
@@ -146,8 +202,11 @@ def submit_session_answer(session_id: str, answer: SessionAnswer, current_user: 
         feedback["next_question"] = session.questions[session.current_index]
     else:
         feedback["message"] = "Game session completed"
-        # Update leaderboard with final score for the current user.
+        print("===========")
+        print(current_user,session.score)
         update_user_leaderboard(current_user, session.score)
         feedback["final_score"] = session.score
+
+    print(feedback)
 
     return feedback

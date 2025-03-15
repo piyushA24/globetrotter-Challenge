@@ -1,20 +1,19 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+FROM python:3.10-slim-buster
 
-# Set the working directory
+# Install system dependencies (for psycopg2, etc.)
+RUN apt-get update && apt-get install -y gcc libpq-dev && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Copy the requirements file into the container at /app
+# Copy requirements and install Python dependencies
 COPY requirements.txt ./
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the current directory contents into the container at /app
+# Copy the entire project
 COPY . .
 
-# Expose port 8000 for the FastAPI application
 EXPOSE 8000
 
-# Run uvicorn to serve the app
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use the entrypoint script to seed data and start the app
+CMD ["/app/entrypoint.sh"]
