@@ -130,6 +130,9 @@ source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
+### 📄 Documentation
+For a detailed project overview and system design, refer to the full documentation here:
+[Globetrotter Challenge Documentation](https://docs.google.com/document/d/1pElZbP8s9p1WI0abB_eVI5zz5f8o31t6d6K7fD_SjMQ/edit?tab=t.0#heading=h.o6hawjs956a)
 
 ## Deployment
 This application is deployed using **Railway**, which automatically manages environment variables and database connectivity.
