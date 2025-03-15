@@ -6,7 +6,6 @@ from PIL import Image, ImageDraw, ImageFont
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 import io
-from fastapi.openapi.models import APIKey
 
 app = FastAPI(
     title="Globetrotter Challenge API",
@@ -14,18 +13,6 @@ app = FastAPI(
     redoc_url="/redoc",  # Redoc available at /redoc
     openapi_url="/openapi.json"
 )
-app.openapi_schema = {
-    "components": {
-        "securitySchemes": {
-            "BearerAuth": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT"
-            }
-        }
-    },
-    "security": [{"BearerAuth": []}]
-}
 
 # Mount your static files on /static (or another subpath)
 app.mount("/static", StaticFiles(directory="static", html=True), name="static")
