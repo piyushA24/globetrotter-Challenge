@@ -11,7 +11,14 @@ app = FastAPI(
     title="Globetrotter Challenge API",
     docs_url="/docs",  # Swagger UI available at /docs
     redoc_url="/redoc",  # Redoc available at /redoc
-    openapi_url="/openapi.json"
+    openapi_url="/openapi.json",
+    swagger_ui_init_oauth={
+        "clientId": "your-client-id",
+        "clientSecret": "your-client-secret",
+        "appName": "Globetrotter Challenge API",
+        "scopes": {"openid": "OpenID Connect scope"},
+        "usePkceWithAuthorizationCodeGrant": True  # Enables PKCE support
+    }
 )
 
 # Mount your static files on /static (or another subpath)
