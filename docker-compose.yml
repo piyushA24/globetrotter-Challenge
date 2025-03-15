@@ -14,7 +14,8 @@ services:
       - POSTGRES_PORT=5432
       - SECRET_KEY=mysecretkey
       # Set FRONTEND_URL to a placeholder; Railway will override this in its settings:
-      - FRONTEND_URL=http://localhost:8000/static/index.html
+      - FRONTEND_URL=https://globetrotter-challenge-production-37b8.up.railway.app/static/index.html
+
 #  postgres:
 #    image: postgres:15
 #    restart: always

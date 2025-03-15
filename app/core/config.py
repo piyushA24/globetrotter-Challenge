@@ -26,7 +26,7 @@ SQLALCHEMY_DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD_ENCO
 # OPENSEARCH_PASSWORD = os.getenv("OPENSEARCH_PASSWORD", "Piyush@123")
 # OPENSEARCH_INDEX = os.getenv("OPENSEARCH_INDEX", "destinations")
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8000/static/index.html")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://globetrotter-challenge-production-37b8.up.railway.app/static/index.html")
 
 # JWT settings
 SECRET_KEY = os.getenv("SECRET_KEY", "mysecretkey")  # Replace with a strong secret in production
