@@ -9,6 +9,10 @@
 ## The Globetrotter Challenge – The Ultimate Travel Guessing Game!
 🧩 I built Globetrotter, a full-stack web app where users get cryptic clues about a famous place and must guess which destination it refers to. Once they guess, they unlock fun facts, trivia, and surprises about the destination!
 
+### 📄 Documentation
+For a detailed project overview and system design, refer to the full documentation here:
+[Globetrotter Challenge Documentation](https://docs.google.com/document/d/1pElZbP8s9p1WI0abB_eVI5zz5f8o31t6d6K7fD_SjMQ/edit?tab=t.0#heading=h.o6hawjs956a)
+
 ### 🔹 Features and Implementation
 #### 1️⃣ Dataset & AI Integration
 - I started with a basic dataset and expanded it using AI tools (e.g., ChatGPT, OpenAI API, Web Scraping, etc.).
@@ -130,9 +134,6 @@ source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
-### 📄 Documentation
-For a detailed project overview and system design, refer to the full documentation here:
-[Globetrotter Challenge Documentation](https://docs.google.com/document/d/1pElZbP8s9p1WI0abB_eVI5zz5f8o31t6d6K7fD_SjMQ/edit?tab=t.0#heading=h.o6hawjs956a)
 
 ## Deployment
 This application is deployed using **Railway**, which automatically manages environment variables and database connectivity.
