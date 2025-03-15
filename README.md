@@ -15,8 +15,8 @@ Ensure you have the following installed:
 
 ### 1. Clone the Repository
 ```sh
-git clone <your-repo-url>
-cd <your-repo-folder>
+git clone https://github.com/piyushA24/globetrotter-Challenge.git
+cd globetrotter-Challenge
 ```
 
 ### 2. Create a `.env` file (Optional)
@@ -49,14 +49,42 @@ If running locally, replace the database host (`POSTGRES_HOST`) from `postgres.r
 
 ## Project Structure
 ```
-/app
-├── main.py        # FastAPI app entry point
-├── models.py      # Database models
-├── routes.py      # API endpoints
-├── requirements.txt  # Dependencies
-├── entrypoint.sh  # Script to initialize DB and start server
-├── Dockerfile     # Docker configuration
-└── docker-compose.yml  # Docker Compose setup
+/globetrotter-Challenge
+├── Dockerfile              # Docker setup
+├── docker-compose.yml      # Docker Compose configuration
+├── requirements.txt        # Python dependencies
+├── README.md               # Documentation
+├── entrypoint.sh           # Script to initialize DB and start server
+├── data/                   # Data-related files
+│   ├── destination_info.json
+├── static/                 # Static frontend files
+│   ├── index.html
+├── app/                    # Backend application
+│   ├── __init__.py
+│   ├── main.py             # FastAPI app entry point
+│   ├── dependencies.py     # Dependency injections
+│   ├── seed.py             # Database seeding script
+│   ├── core/               # Core configurations
+│   │   ├── __init__.py
+│   │   ├── config.py       # Application config settings
+│   │   ├── database.py     # Database connection
+│   ├── models/             # Database models
+│   │   ├── __init__.py
+│   │   ├── destination.py
+│   │   ├── leaderboard.py
+│   │   ├── notifications.py
+│   │   ├── user.py
+│   ├── routers/            # API endpoints
+│   │   ├── __init__.py
+│   │   ├── auth.py
+│   │   ├── challenge.py
+│   │   ├── game.py
+│   │   ├── leaderboard.py
+│   │   ├── notifications.py
+│   ├── services/           # Business logic
+│   │   ├── __init__.py
+│   │   ├── data_loader.py
+│   │   ├── leaderboard_service.py
 ```
 
 ## Development
