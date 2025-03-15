@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -10,8 +10,9 @@ import jwt
 from app.core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter()
+security = HTTPBearer()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 def fake_hash_password(password: str):
     return "fakehashed" + password
@@ -95,8 +96,14 @@ def login(user_login: UserLogin, db: Session = Depends(get_db)):
     user = authenticate_user(db, user_login.email, user_login.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     token_data = {"user_id": user.id, "username": user.username}
     access_token = create_access_token(data=token_data, expires_delta=access_token_expires)
-    print("login successful")
-    return {"access_token": access_token, "token_type": "bearer", "username": user.username}
+
+    print("Login successful")
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "username": user.username
+    }
