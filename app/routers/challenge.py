@@ -28,7 +28,7 @@ def get_challenge_details(inviter_id: int, db: Session = Depends(get_db)):
     inviter_score = lb_entry.score if lb_entry else 0
 
     # Use the FRONTEND_URL environment variable if set; otherwise, default to the static UI
-    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:8000/static/index.html")
+    frontend_url = os.getenv("FRONTEND_URL", "https://globetrotter-challenge-production-37b8.up.railway.app/static/index.html")  #
     share_link = f"{frontend_url}?inviter_id={inviter_id}"
 
     return {

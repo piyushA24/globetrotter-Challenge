@@ -203,7 +203,7 @@
         friend_id: currentUser,  // currentUser is set upon login
         friend_score: friendScore
       };
-      fetch("http://localhost:8000/challenge/update", {
+      fetch("http://0.0.0.0:8000/challenge/update", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -226,7 +226,7 @@
 
     // Poll notifications every 5 seconds (optional)
     // function pollNotifications() {
-    //   fetch("http://localhost:8000/notifications", {
+    //   fetch("http://0.0.0.0:8000/notifications", {
     //     headers: { "Authorization": "Bearer " + token }
     //   }).then(r => r.json()).then(console.log);
     //
@@ -244,7 +244,7 @@
     // }
 
     // function loadNotifications() {
-    //   fetch("http://localhost:8000/notifications", {
+    //   fetch("http://0.0.0.0:8000/notifications", {
     //     headers: { "Authorization": "Bearer " + token }
     //   })
     //   .then(response => response.json())
@@ -255,7 +255,7 @@
     // }
 
     // function markNotificationAsRead(notificationId) {
-    //   fetch(`http://localhost:8000/notifications/${notificationId}/read`, {
+    //   fetch(`http://0.0.0.0:8000/notifications/${notificationId}/read`, {
     //     method: "POST",
     //     headers: { "Authorization": "Bearer " + token }
     //   })
@@ -269,7 +269,7 @@
       const email = document.getElementById("regEmail").value;
       const username = document.getElementById("regUsername").value;
       const password = document.getElementById("regPassword").value;
-      fetch("http://localhost:8000/auth/register", {
+      fetch("http://0.0.0.0:8000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, username, password })
@@ -309,7 +309,7 @@
     // function loginUser() {
     //   const email = document.getElementById("loginEmail").value;
     //   const password = document.getElementById("loginPassword").value;
-    //   fetch("http://localhost:8000/auth/login", {
+    //   fetch("http://0.0.0.0:8000/auth/login", {
     //     method: "POST",
     //     headers: { "Content-Type": "application/json" },
     //     body: JSON.stringify({ email, password })
@@ -339,7 +339,7 @@
     function loginUser() {
       const email = document.getElementById("loginEmail").value;
       const password = document.getElementById("loginPassword").value;
-      fetch("http://localhost:8000/auth/login", {
+      fetch("http://0.0.0.0:8000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -369,7 +369,7 @@
     }
 
     function loadLeaderboard() {
-      fetch("http://localhost:8000/leaderboard/global", {
+      fetch("http://0.0.0.0:8000/leaderboard/global", {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(response => response.json())
@@ -395,7 +395,7 @@
       document.getElementById("statusDiv").textContent = "";
       document.getElementById("feedback").textContent = "";
 
-      fetch("http://localhost:8000/game/session/start?ts=" + new Date().getTime(), {
+      fetch("http://0.0.0.0:8000/game/session/start?ts=" + new Date().getTime(), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -456,7 +456,7 @@
     }
 
     function submitAnswer(selectedOption) {
-      fetch(`http://localhost:8000/game/session/${sessionId}/submit`, {
+      fetch(`http://0.0.0.0:8000/game/session/${sessionId}/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -507,7 +507,7 @@
         alert("User id not found. Please log in again.");
         return;
       }
-      fetch(`http://localhost:8000/challenge/${currentUser}`, {
+      fetch(`http://0.0.0.0:8000/challenge/${currentUser}`, {
         headers: { "Authorization": "Bearer " + token }
       })
       .then(response => response.json())
@@ -518,7 +518,7 @@
         const whatsappUrl = `https://api.whatsapp.com/send?text=${shareText}`;
 
         // Build the dynamic image URL using the dynamic-image endpoint
-        const dynamicImageUrl = `http://localhost:8000/dynamic-image/${encodeURIComponent(data.username)}/${data.score}`;
+        const dynamicImageUrl = `http://0.0.0.0:8000/dynamic-image/${encodeURIComponent(data.username)}/${data.score}`;
         document.getElementById("challengeImage").src = dynamicImageUrl;
 
         document.getElementById("challengeDetails").textContent = `Invited by: ${data.username}\nScore: ${data.score}\nInvite Link: ${shareLink}`;
