@@ -13,6 +13,24 @@ app = FastAPI(
     redoc_url="/redoc",  # Redoc available at /redoc
     openapi_url="/openapi.json"
 )
+# Custom OpenAPI Schema (optional, auto-handled by FastAPI)
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = app.openapi()
+    openapi_schema["components"]["securitySchemes"] = {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+        }
+    }
+    openapi_schema["security"] = [{"BearerAuth": []}]
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+# Apply the custom OpenAPI schema
+app.openapi = custom_openapi
 
 # Mount your static files on /static (or another subpath)
 app.mount("/static", StaticFiles(directory="static", html=True), name="static")
