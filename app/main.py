@@ -15,31 +15,6 @@ app = FastAPI(
     redoc_url="/redoc",  # Redoc available at /redoc
     openapi_url="/openapi.json"
 )
-# Custom OpenAPI Schema (optional, auto-handled by FastAPI)
-# Store the original OpenAPI function
-# ✅ Custom OpenAPI Schema - Ensures JWT Bearer Token appears in Swagger UI
-def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
-    openapi_schema = get_openapi(
-        title=app.title,
-        version="1.0.0",
-        description="Globetrotter Challenge API with JWT authentication",
-        routes=app.routes,
-    )
-    openapi_schema["components"]["securitySchemes"] = {
-        "BearerAuth": {
-            "type": "http",
-            "scheme": "bearer",
-            "bearerFormat": "JWT",
-        }
-    }
-    openapi_schema["security"] = [{"BearerAuth": []}]  # Apply security globally
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema
-
-# Override FastAPI's OpenAPI generation
-app.openapi = custom_openapi
 
 # Mount your static files on /static (or another subpath)
 app.mount("/static", StaticFiles(directory="static", html=True), name="static")
